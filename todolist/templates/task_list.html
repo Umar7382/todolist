@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do App</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static "style.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+
+<body>
+    <div class="container">
+        {% include "message.html" %}
+        <h2>To Do App</h2>
+
+        <!-- Task Form -->
+        <div class="form-container">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="text" name="taskname" placeholder="Enter a task here" class="task-input" required>
+                <input type="date" name="date" class="date-input" required>
+                <!-- <input type="checkbox" name="status" class="status-input"> Started -->
+                <button type="submit" class="save-btn">Save</button>
+            </form>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <div class="table-controls">
+                <label>Show
+                    <select>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select> entries
+                </label>
+                <div class="pagination">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="{% url 'finding' 1 %}">Started</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{% url 'finding' 2 %}">All Tasks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{% url 'finding' 3 %}">Completed</a>
+                        </li>
+                    </ul>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="text" name="search" placeholder="Search" class="search-input">
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+
+            <!-- To Do Table -->
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Todo item</th>
+                        <th>Status</th>
+                        <th>Due</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ task.taskname|capfirst }}</td>
+                        <td>{{ task.status }}</td>
+                        <td>{{ task.date }}</td>
+                        <td>
+                            <a href="{% url "edit_todo" task.pk %}"><button class="edit-btn"><i class="fas fa-edit"></i> Edit</button></a>
+                            <a href="{% url 'delete_todo' task.pk %}"><button class="delete-btn"><i class="fas fa-trash-alt"></i> Delete</button></a>
+                            <a href="{% url "finish" task.id %}"><button class="finished-btn"><i class="fas fa-check-circle"></i> Finish</button></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align:center; font-size: 18px; font-weight: bold; color: #34C759; border: 1px solid #CCCCCC; padding: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2);">🎉 Yay, you have no pending tasks!</td>
+                    </tr>                                    
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <span>Showing 1 to {{ tasks|length }} of {{ tasks|length }} entries</span>
+        </div>
+
+        <div class="signout-btn-container">
+            <a href="{% url 'signout' %}"><button class="delete-btn">Sign Out</button></a>
+        </div>
+    </div>
+
+</body>
+</html>
